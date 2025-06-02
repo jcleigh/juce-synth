@@ -36,10 +36,27 @@ public:
 
     void getStateInformation(juce::MemoryBlock& destData) override;
     void setStateInformation(const void* data, int sizeInBytes) override;
+    
+    // Parameter access
+    juce::AudioProcessorValueTreeState& getValueTreeState() { return parameters; }
 
 private:
     juce::Synthesiser synth;
     const int numVoices = 8; // Number of simultaneous notes
+    
+    // Parameter management
+    juce::AudioProcessorValueTreeState parameters;
+    
+    // Parameter pointers
+    std::atomic<float>* waveformParam = nullptr;
+    std::atomic<float>* filterCutoffParam = nullptr;
+    std::atomic<float>* filterResonanceParam = nullptr;
+    std::atomic<float>* attackParam = nullptr;
+    std::atomic<float>* decayParam = nullptr;
+    std::atomic<float>* sustainParam = nullptr;
+    std::atomic<float>* releaseParam = nullptr;
+    
+    void updateVoiceParameters();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(JuceSynthAudioProcessor)
 };

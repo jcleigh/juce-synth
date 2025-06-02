@@ -3,8 +3,34 @@
 
 JuceSynthAudioProcessor::JuceSynthAudioProcessor()
     : AudioProcessor(BusesProperties()
-                     .withOutput("Output", juce::AudioChannelSet::stereo(), true))
+                     .withOutput("Output", juce::AudioChannelSet::stereo(), true)),
+      parameters(*this, nullptr, "PARAMETERS",
+      {
+          std::make_unique<juce::AudioParameterChoice>("waveform", "Waveform", 
+              juce::StringArray{"Sine", "Saw", "Square", "Triangle", "Noise"}, 0),
+          std::make_unique<juce::AudioParameterFloat>("filterCutoff", "Filter Cutoff",
+              juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 0.3f), 1000.0f),
+          std::make_unique<juce::AudioParameterFloat>("filterResonance", "Filter Resonance",
+              juce::NormalisableRange<float>(0.1f, 2.0f, 0.01f), 0.7f),
+          std::make_unique<juce::AudioParameterFloat>("attack", "Attack",
+              juce::NormalisableRange<float>(0.001f, 5.0f, 0.001f, 0.3f), 0.1f),
+          std::make_unique<juce::AudioParameterFloat>("decay", "Decay",
+              juce::NormalisableRange<float>(0.001f, 5.0f, 0.001f, 0.3f), 0.3f),
+          std::make_unique<juce::AudioParameterFloat>("sustain", "Sustain",
+              juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.6f),
+          std::make_unique<juce::AudioParameterFloat>("release", "Release",
+              juce::NormalisableRange<float>(0.001f, 5.0f, 0.001f, 0.3f), 0.8f)
+      })
 {
+    // Get parameter pointers
+    waveformParam = parameters.getRawParameterValue("waveform");
+    filterCutoffParam = parameters.getRawParameterValue("filterCutoff");
+    filterResonanceParam = parameters.getRawParameterValue("filterResonance");
+    attackParam = parameters.getRawParameterValue("attack");
+    decayParam = parameters.getRawParameterValue("decay");
+    sustainParam = parameters.getRawParameterValue("sustain");
+    releaseParam = parameters.getRawParameterValue("release");
+    
     // Initialize the synthesizer with voices
     for (int i = 0; i < numVoices; ++i)
     {
@@ -109,6 +135,9 @@ void JuceSynthAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
+    // Update voice parameters
+    updateVoiceParameters();
+
     // Process the synthesizer with MIDI messages and generate audio
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 }
@@ -125,17 +154,42 @@ juce::AudioProcessorEditor* JuceSynthAudioProcessor::createEditor()
 
 void JuceSynthAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
-    juce::ignoreUnused(destData);
+    auto state = parameters.copyState();
+    std::unique_ptr<juce::XmlElement> xml(state.createXml());
+    copyXmlToBinary(*xml, destData);
 }
 
 void JuceSynthAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
-    juce::ignoreUnused(data, sizeInBytes);
+    std::unique_ptr<juce::XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+    
+    if (xmlState.get() != nullptr)
+        if (xmlState->hasTagName(parameters.state.getType()))
+            parameters.replaceState(juce::ValueTree::fromXml(*xmlState));
+}
+
+void JuceSynthAudioProcessor::updateVoiceParameters()
+{
+    const auto waveform = static_cast<SynthVoice::WaveformType>(static_cast<int>(waveformParam->load()));
+    const auto cutoff = filterCutoffParam->load();
+    const auto resonance = filterResonanceParam->load();
+    
+    juce::ADSR::Parameters adsrParams;
+    adsrParams.attack = attackParam->load();
+    adsrParams.decay = decayParam->load();
+    adsrParams.sustain = sustainParam->load();
+    adsrParams.release = releaseParam->load();
+    
+    for (int i = 0; i < synth.getNumVoices(); ++i)
+    {
+        if (auto voice = dynamic_cast<SynthVoice*>(synth.getVoice(i)))
+        {
+            voice->setWaveform(waveform);
+            voice->setFilterCutoff(cutoff);
+            voice->setFilterResonance(resonance);
+            voice->setADSRParameters(adsrParams);
+        }
+    }
 }
 
 // This creates new instances of the plugin

@@ -7,6 +7,15 @@
 class SynthVoice : public juce::SynthesiserVoice
 {
 public:
+    enum WaveformType
+    {
+        Sine = 0,
+        Saw,
+        Square,
+        Triangle,
+        Noise
+    };
+    
     SynthVoice();
     
     bool canPlaySound(juce::SynthesiserSound* sound) override;
@@ -17,6 +26,12 @@ public:
     void prepareToPlay(double sampleRate, int samplesPerBlock, int outputChannels);
     void renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int startSample, int numSamples) override;
     
+    // Parameter setters for external control
+    void setWaveform(WaveformType waveform) { currentWaveform = waveform; }
+    void setFilterCutoff(float cutoff) { filterCutoff = cutoff; updateFilter(); }
+    void setFilterResonance(float resonance) { filterResonance = resonance; updateFilter(); }
+    void setADSRParameters(const juce::ADSR::Parameters& params) { adsrParams = params; adsr.setParameters(adsrParams); }
+    
 private:
     double level;
     double frequency;
@@ -25,7 +40,22 @@ private:
     
     bool isPlaying;
     
+    // Oscillator
+    WaveformType currentWaveform;
+    
+    // Filter
+    float filterCutoff;
+    float filterResonance;
+    juce::dsp::StateVariableTPTFilter<float> filter;
+    
     // ADSR envelope
     juce::ADSR adsr;
     juce::ADSR::Parameters adsrParams;
+    
+    // Random number generator for noise
+    juce::Random random;
+    
+    // Helper methods
+    float generateWaveform();
+    void updateFilter();
 };
