@@ -39,11 +39,16 @@ This is a basic "Hello World" synthesizer VST3 plugin built with the JUCE framew
    cmake --build .
    ```
 
-4. The VST3 plugin will be created in the `build` directory.
+4. The VST3 plugin will be created in the `build/JuceSynth_artefacts/VST3/` directory.
+
+5. **Install the plugin manually** (optional):
+   - **Windows**: Copy `JuceSynth.vst3` to `C:\Program Files\Common Files\VST3\`
+   - **macOS**: Copy `JuceSynth.vst3` to `~/Library/Audio/Plug-Ins/VST3/` or `/Library/Audio/Plug-Ins/VST3/`
+   - **Linux**: Copy `JuceSynth.vst3` to `~/.vst3/` or `/usr/local/lib/vst3/`
 
 ## Usage
 
-1. Copy the VST3 plugin to your DAW's VST plugin directory
+1. Install the VST3 plugin to your DAW's VST plugin directory (see step 5 above)
 2. Open your DAW and scan for new plugins
 3. Create a new track with the JuceSynth plugin
 4. Play MIDI notes to hear the synthesizer
