@@ -15,7 +15,7 @@ This is a basic "Hello World" synthesizer VST3 plugin built with the JUCE framew
 
 ### Prerequisites
 
-- CMake (version 3.15 or higher)
+- CMake (version 3.22 or higher)
 - C++ compiler supporting C++17
 - Git
 
