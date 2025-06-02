@@ -73,4 +73,4 @@ target_link_libraries(JuceSynth
 )
 
 # Add a target for running the plugin
-juce_enable_copy_plugin_step(JuceSynth)
+# juce_enable_copy_plugin_step(JuceSynth)  # Commented out to avoid permission errors when building
