@@ -40,6 +40,17 @@ target_include_directories(JuceSynth
 # Set C++ standard
 target_compile_features(JuceSynth PRIVATE cxx_std_17)
 
+# Add GTK include directories for GUI extra support on Linux
+if(UNIX AND NOT APPLE)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
+    pkg_check_modules(WEBKIT REQUIRED webkit2gtk-4.1)
+    pkg_check_modules(CURL REQUIRED libcurl)
+    target_include_directories(JuceSynth PRIVATE ${GTK3_INCLUDE_DIRS} ${WEBKIT_INCLUDE_DIRS})
+    target_link_libraries(JuceSynth PRIVATE ${GTK3_LIBRARIES} ${WEBKIT_LIBRARIES} ${CURL_LIBRARIES})
+    target_compile_options(JuceSynth PRIVATE ${GTK3_CFLAGS} ${WEBKIT_CFLAGS})
+endif()
+
 # Add required JUCE modules
 target_link_libraries(JuceSynth
     PRIVATE
