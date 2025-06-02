@@ -55,6 +55,8 @@ private:
     std::atomic<float>* decayParam = nullptr;
     std::atomic<float>* sustainParam = nullptr;
     std::atomic<float>* releaseParam = nullptr;
+    std::atomic<float>* lfoRateParam = nullptr;
+    std::atomic<float>* lfoAmountParam = nullptr;
     
     void updateVoiceParameters();
 

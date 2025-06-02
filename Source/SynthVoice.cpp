@@ -3,7 +3,8 @@
 
 SynthVoice::SynthVoice()
     : level(0.0), frequency(0.0), phase(0.0), sampleRate(44100.0), isPlaying(false),
-      currentWaveform(Sine), filterCutoff(1000.0f), filterResonance(0.7f)
+      currentWaveform(Sine), filterCutoff(1000.0f), filterResonance(0.7f), baseCutoff(1000.0f),
+      lfoRate(2.0f), lfoAmount(0.0f), lfoPhase(0.0)
 {
     // Set default ADSR parameters
     adsrParams.attack = 0.1f;
@@ -27,6 +28,7 @@ void SynthVoice::startNote(int midiNoteNumber, float velocity, juce::Synthesiser
     frequency = juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber);
     level = velocity * 0.15;
     phase = 0.0;
+    lfoPhase = 0.0; // Reset LFO phase on new note
     isPlaying = true;
     
     adsr.noteOn();
@@ -84,9 +86,17 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int sta
     }
     
     const double phaseIncrement = 2.0 * juce::MathConstants<double>::pi * frequency / sampleRate;
+    const double lfoPhaseIncrement = 2.0 * juce::MathConstants<double>::pi * lfoRate / sampleRate;
     
     for (int sample = 0; sample < numSamples; ++sample)
     {
+        // Calculate LFO value
+        const float lfoValue = static_cast<float>(std::sin(lfoPhase));
+        
+        // Apply LFO to filter cutoff
+        const float modulatedCutoff = baseCutoff + (lfoValue * lfoAmount * baseCutoff * 0.5f);
+        filter.setCutoffFrequency(juce::jlimit(20.0f, 20000.0f, modulatedCutoff));
+        
         const float waveformSample = generateWaveform();
         const float envelopedSample = waveformSample * level * adsr.getNextSample();
         
@@ -101,6 +111,10 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int sta
         phase += phaseIncrement;
         if (phase >= 2.0 * juce::MathConstants<double>::pi)
             phase -= 2.0 * juce::MathConstants<double>::pi;
+            
+        lfoPhase += lfoPhaseIncrement;
+        if (lfoPhase >= 2.0 * juce::MathConstants<double>::pi)
+            lfoPhase -= 2.0 * juce::MathConstants<double>::pi;
     }
 }
 

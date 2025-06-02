@@ -28,9 +28,11 @@ public:
     
     // Parameter setters for external control
     void setWaveform(WaveformType waveform) { currentWaveform = waveform; }
-    void setFilterCutoff(float cutoff) { filterCutoff = cutoff; updateFilter(); }
+    void setFilterCutoff(float cutoff) { filterCutoff = cutoff; baseCutoff = cutoff; updateFilter(); }
     void setFilterResonance(float resonance) { filterResonance = resonance; updateFilter(); }
     void setADSRParameters(const juce::ADSR::Parameters& params) { adsrParams = params; adsr.setParameters(adsrParams); }
+    void setLFORate(float rate) { lfoRate = rate; }
+    void setLFOAmount(float amount) { lfoAmount = amount; }
     
 private:
     double level;
@@ -46,7 +48,13 @@ private:
     // Filter
     float filterCutoff;
     float filterResonance;
+    float baseCutoff; // Store the base cutoff for LFO modulation
     juce::dsp::StateVariableTPTFilter<float> filter;
+    
+    // LFO
+    float lfoRate;
+    float lfoAmount;
+    double lfoPhase;
     
     // ADSR envelope
     juce::ADSR adsr;

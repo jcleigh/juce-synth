@@ -81,6 +81,8 @@ private:
     std::unique_ptr<SynthKnob> decayKnob;
     std::unique_ptr<SynthKnob> sustainKnob;
     std::unique_ptr<SynthKnob> releaseKnob;
+    std::unique_ptr<SynthKnob> lfoRateKnob;
+    std::unique_ptr<SynthKnob> lfoAmountKnob;
     
     // Labels
     std::unique_ptr<juce::Label> waveformLabel;
@@ -90,6 +92,8 @@ private:
     std::unique_ptr<juce::Label> decayLabel;
     std::unique_ptr<juce::Label> sustainLabel;
     std::unique_ptr<juce::Label> releaseLabel;
+    std::unique_ptr<juce::Label> lfoRateLabel;
+    std::unique_ptr<juce::Label> lfoAmountLabel;
     
     // Attachments
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> waveformAttachment;
@@ -99,6 +103,8 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> decayAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sustainAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> releaseAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> lfoRateAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> lfoAmountAttachment;
     
     void setupKnobAndLabel(std::unique_ptr<SynthKnob>& knob, 
                           std::unique_ptr<juce::Label>& label,

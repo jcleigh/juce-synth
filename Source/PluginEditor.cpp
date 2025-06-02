@@ -5,7 +5,7 @@ JuceSynthAudioProcessorEditor::JuceSynthAudioProcessorEditor(JuceSynthAudioProce
     : AudioProcessorEditor(&p), processorRef(p)
 {
     // Set the size of the editor window to a 90s synth style
-    setSize(700, 400);
+    setSize(800, 400);
     
     // Setup oscillator section
     setupKnobAndLabel(waveformKnob, waveformLabel, "WAVEFORM");
@@ -20,6 +20,10 @@ JuceSynthAudioProcessorEditor::JuceSynthAudioProcessorEditor(JuceSynthAudioProce
     setupKnobAndLabel(filterCutoffKnob, filterCutoffLabel, "CUTOFF");
     setupKnobAndLabel(filterResonanceKnob, filterResonanceLabel, "RESONANCE");
     
+    // Setup LFO section
+    setupKnobAndLabel(lfoRateKnob, lfoRateLabel, "LFO RATE");
+    setupKnobAndLabel(lfoAmountKnob, lfoAmountLabel, "LFO AMOUNT");
+    
     // Setup envelope section
     setupKnobAndLabel(attackKnob, attackLabel, "ATTACK");
     setupKnobAndLabel(decayKnob, decayLabel, "DECAY");
@@ -31,6 +35,8 @@ JuceSynthAudioProcessorEditor::JuceSynthAudioProcessorEditor(JuceSynthAudioProce
     waveformAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(params, "waveform", *waveformKnob);
     filterCutoffAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(params, "filterCutoff", *filterCutoffKnob);
     filterResonanceAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(params, "filterResonance", *filterResonanceKnob);
+    lfoRateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(params, "lfoRate", *lfoRateKnob);
+    lfoAmountAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(params, "lfoAmount", *lfoAmountKnob);
     attackAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(params, "attack", *attackKnob);
     decayAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(params, "decay", *decayKnob);
     sustainAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(params, "sustain", *sustainKnob);
@@ -57,15 +63,17 @@ void JuceSynthAudioProcessorEditor::paint(juce::Graphics& g)
     
     // Draw sections
     g.setColour(backgroundAccent);
-    g.fillRoundedRectangle(20, 80, 160, 280, 5.0f);  // Oscillator section
-    g.fillRoundedRectangle(200, 80, 220, 280, 5.0f); // Filter section
-    g.fillRoundedRectangle(440, 80, 240, 280, 5.0f); // Envelope section
+    g.fillRoundedRectangle(20, 80, 140, 280, 5.0f);  // Oscillator section
+    g.fillRoundedRectangle(180, 80, 220, 280, 5.0f); // Filter section
+    g.fillRoundedRectangle(420, 80, 160, 280, 5.0f); // LFO section
+    g.fillRoundedRectangle(600, 80, 180, 280, 5.0f); // Envelope section
     
     // Draw section outlines
     g.setColour(orange);
-    g.drawRoundedRectangle(20, 80, 160, 280, 5.0f, 2.0f);
-    g.drawRoundedRectangle(200, 80, 220, 280, 5.0f, 2.0f);
-    g.drawRoundedRectangle(440, 80, 240, 280, 5.0f, 2.0f);
+    g.drawRoundedRectangle(20, 80, 140, 280, 5.0f, 2.0f);
+    g.drawRoundedRectangle(180, 80, 220, 280, 5.0f, 2.0f);
+    g.drawRoundedRectangle(420, 80, 160, 280, 5.0f, 2.0f);
+    g.drawRoundedRectangle(600, 80, 180, 280, 5.0f, 2.0f);
     
     // Draw title
     g.setColour(orange);
@@ -75,30 +83,37 @@ void JuceSynthAudioProcessorEditor::paint(juce::Graphics& g)
     // Draw section labels
     g.setFont(juce::Font("Arial", 14.0f, juce::Font::bold));
     g.setColour(juce::Colours::white);
-    g.drawFittedText("OSCILLATOR", 30, 90, 140, 20, juce::Justification::centred, 1);
-    g.drawFittedText("FILTER", 210, 90, 200, 20, juce::Justification::centred, 1);
-    g.drawFittedText("ENVELOPE", 450, 90, 220, 20, juce::Justification::centred, 1);
+    g.drawFittedText("OSCILLATOR", 30, 90, 120, 20, juce::Justification::centred, 1);
+    g.drawFittedText("FILTER", 190, 90, 200, 20, juce::Justification::centred, 1);
+    g.drawFittedText("LFO", 430, 90, 140, 20, juce::Justification::centred, 1);
+    g.drawFittedText("ENVELOPE", 610, 90, 160, 20, juce::Justification::centred, 1);
 }
 
 void JuceSynthAudioProcessorEditor::resized()
 {
     const int knobSize = 70;
     const int labelHeight = 20;
-    const int spacing = 10;
     
     // Oscillator section
-    waveformKnob->setBounds(60, 130, knobSize, knobSize);
-    waveformLabel->setBounds(45, 200, 100, labelHeight);
+    waveformKnob->setBounds(55, 130, knobSize, knobSize);
+    waveformLabel->setBounds(40, 200, 100, labelHeight);
     
     // Filter section  
-    filterCutoffKnob->setBounds(230, 130, knobSize, knobSize);
-    filterCutoffLabel->setBounds(215, 200, 100, labelHeight);
+    filterCutoffKnob->setBounds(210, 130, knobSize, knobSize);
+    filterCutoffLabel->setBounds(195, 200, 100, labelHeight);
     
-    filterResonanceKnob->setBounds(320, 130, knobSize, knobSize);
-    filterResonanceLabel->setBounds(305, 200, 100, labelHeight);
+    filterResonanceKnob->setBounds(300, 130, knobSize, knobSize);
+    filterResonanceLabel->setBounds(285, 200, 100, labelHeight);
+    
+    // LFO section
+    lfoRateKnob->setBounds(440, 130, knobSize, knobSize);
+    lfoRateLabel->setBounds(425, 200, 100, labelHeight);
+    
+    lfoAmountKnob->setBounds(520, 130, knobSize, knobSize);
+    lfoAmountLabel->setBounds(505, 200, 100, labelHeight);
     
     // Envelope section
-    int envX = 460;
+    int envX = 620;
     attackKnob->setBounds(envX, 130, knobSize, knobSize);
     attackLabel->setBounds(envX - 15, 200, 100, labelHeight);
     
@@ -106,13 +121,11 @@ void JuceSynthAudioProcessorEditor::resized()
     decayKnob->setBounds(envX, 130, knobSize, knobSize);
     decayLabel->setBounds(envX - 15, 200, 100, labelHeight);
     
-    envX += 80;
-    sustainKnob->setBounds(envX, 130, knobSize, knobSize);
-    sustainLabel->setBounds(envX - 15, 200, 100, labelHeight);
+    sustainKnob->setBounds(620, 240, knobSize, knobSize);
+    sustainLabel->setBounds(605, 310, 100, labelHeight);
     
-    envX += 80;
-    releaseKnob->setBounds(envX, 240, knobSize, knobSize);
-    releaseLabel->setBounds(envX - 15, 310, 100, labelHeight);
+    releaseKnob->setBounds(700, 240, knobSize, knobSize);
+    releaseLabel->setBounds(685, 310, 100, labelHeight);
 }
 
 void JuceSynthAudioProcessorEditor::setupKnobAndLabel(std::unique_ptr<SynthKnob>& knob, 

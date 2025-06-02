@@ -19,7 +19,11 @@ JuceSynthAudioProcessor::JuceSynthAudioProcessor()
           std::make_unique<juce::AudioParameterFloat>("sustain", "Sustain",
               juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.6f),
           std::make_unique<juce::AudioParameterFloat>("release", "Release",
-              juce::NormalisableRange<float>(0.001f, 5.0f, 0.001f, 0.3f), 0.8f)
+              juce::NormalisableRange<float>(0.001f, 5.0f, 0.001f, 0.3f), 0.8f),
+          std::make_unique<juce::AudioParameterFloat>("lfoRate", "LFO Rate",
+              juce::NormalisableRange<float>(0.1f, 20.0f, 0.1f), 2.0f),
+          std::make_unique<juce::AudioParameterFloat>("lfoAmount", "LFO Amount",
+              juce::NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.0f)
       })
 {
     // Get parameter pointers
@@ -30,6 +34,8 @@ JuceSynthAudioProcessor::JuceSynthAudioProcessor()
     decayParam = parameters.getRawParameterValue("decay");
     sustainParam = parameters.getRawParameterValue("sustain");
     releaseParam = parameters.getRawParameterValue("release");
+    lfoRateParam = parameters.getRawParameterValue("lfoRate");
+    lfoAmountParam = parameters.getRawParameterValue("lfoAmount");
     
     // Initialize the synthesizer with voices
     for (int i = 0; i < numVoices; ++i)
@@ -173,6 +179,8 @@ void JuceSynthAudioProcessor::updateVoiceParameters()
     const auto waveform = static_cast<SynthVoice::WaveformType>(static_cast<int>(waveformParam->load()));
     const auto cutoff = filterCutoffParam->load();
     const auto resonance = filterResonanceParam->load();
+    const auto lfoRate = lfoRateParam->load();
+    const auto lfoAmount = lfoAmountParam->load();
     
     juce::ADSR::Parameters adsrParams;
     adsrParams.attack = attackParam->load();
@@ -188,6 +196,8 @@ void JuceSynthAudioProcessor::updateVoiceParameters()
             voice->setFilterCutoff(cutoff);
             voice->setFilterResonance(resonance);
             voice->setADSRParameters(adsrParams);
+            voice->setLFORate(lfoRate);
+            voice->setLFOAmount(lfoAmount);
         }
     }
 }
