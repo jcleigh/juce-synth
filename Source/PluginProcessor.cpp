@@ -7,9 +7,9 @@ JuceSynthAudioProcessor::JuceSynthAudioProcessor()
       parameters(*this, nullptr, "PARAMETERS",
       {
           std::make_unique<juce::AudioParameterChoice>("waveform", "Waveform", 
-              juce::StringArray{"Sine", "Saw", "Square", "Triangle", "Noise"}, 0),
+              juce::StringArray{"Sine", "Saw", "Square", "Triangle", "Noise"}, 1),
           std::make_unique<juce::AudioParameterFloat>("filterCutoff", "Filter Cutoff",
-              juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 0.3f), 1000.0f),
+              juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 0.3f), 8000.0f),
           std::make_unique<juce::AudioParameterFloat>("filterResonance", "Filter Resonance",
               juce::NormalisableRange<float>(0.1f, 2.0f, 0.01f), 0.7f),
           std::make_unique<juce::AudioParameterFloat>("attack", "Attack",

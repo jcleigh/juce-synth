@@ -3,7 +3,7 @@
 
 SynthVoice::SynthVoice()
     : level(0.0), frequency(0.0), phase(0.0), sampleRate(44100.0), isPlaying(false),
-      currentWaveform(Sine), filterCutoff(1000.0f), filterResonance(0.7f), baseCutoff(1000.0f),
+      currentWaveform(Saw), filterCutoff(8000.0f), filterResonance(0.7f), baseCutoff(8000.0f),
       lfoRate(2.0f), lfoAmount(0.0f), lfoPhase(0.0)
 {
     // Set default ADSR parameters

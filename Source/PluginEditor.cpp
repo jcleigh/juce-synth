@@ -78,7 +78,7 @@ void JuceSynthAudioProcessorEditor::paint(juce::Graphics& g)
     // Draw title
     g.setColour(orange);
     g.setFont(juce::Font("Arial", 24.0f, juce::Font::bold));
-    g.drawFittedText("RETRO SYNTH", 20, 10, getWidth() - 40, 40, juce::Justification::centred, 1);
+    g.drawFittedText("RETRO SYNTH v2.0 - ENHANCED", 20, 10, getWidth() - 40, 40, juce::Justification::centred, 1);
     
     // Draw section labels
     g.setFont(juce::Font("Arial", 14.0f, juce::Font::bold));
