@@ -15,7 +15,11 @@ juce_add_plugin(JuceSynth
     PLUGIN_CODE Jsyn
     IS_SYNTH TRUE
     NEEDS_MIDI_INPUT TRUE
+    NEEDS_MIDI_OUTPUT FALSE
+    IS_MIDI_EFFECT FALSE
+    EDITOR_WANTS_KEYBOARD_FOCUS FALSE
     VST3_CATEGORIES Instrument Synth
+    DESCRIPTION "A simple synthesizer plugin"
 )
 
 # Add source files
