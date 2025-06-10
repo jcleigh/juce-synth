@@ -76,6 +76,11 @@ double JuceSynthAudioProcessor::getTailLengthSeconds() const
     return 0.0;
 }
 
+bool JuceSynthAudioProcessor::supportsDoublePrecisionProcessing() const
+{
+    return false;
+}
+
 int JuceSynthAudioProcessor::getNumPrograms()
 {
     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
@@ -124,6 +129,10 @@ void JuceSynthAudioProcessor::releaseResources()
 
 bool JuceSynthAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
 {
+    // This is a synthesizer: no audio input, stereo output only
+    if (layouts.getMainInputChannelSet() != juce::AudioChannelSet::disabled())
+        return false;
+        
     // We only support stereo output
     if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
         return false;

@@ -27,6 +27,9 @@ public:
     bool producesMidi() const override;
     bool isMidiEffect() const override;
     double getTailLengthSeconds() const override;
+    
+    // Additional plugin characteristics for better VST3 support
+    bool supportsDoublePrecisionProcessing() const override;
 
     int getNumPrograms() override;
     int getCurrentProgram() override;

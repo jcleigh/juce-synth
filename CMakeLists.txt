@@ -10,12 +10,23 @@ juce_add_plugin(JuceSynth
     VERSION 0.0.1
     COMPANY_NAME "Jordan Cleigh"
     PRODUCT_NAME "JuceSynth"
+    BUNDLE_ID "com.jordancleigh.jucesynth"
     FORMATS VST3
     PLUGIN_MANUFACTURER_CODE Jclg
     PLUGIN_CODE Jsyn
     IS_SYNTH TRUE
     NEEDS_MIDI_INPUT TRUE
-    VST3_CATEGORIES Instrument Synth
+    NEEDS_MIDI_OUTPUT FALSE
+    IS_MIDI_EFFECT FALSE
+    EDITOR_WANTS_KEYBOARD_FOCUS FALSE
+    VST3_CATEGORIES "Instrument|Synth"
+    DESCRIPTION "A simple synthesizer plugin"
+)
+
+# Disable webkit to avoid web browser dependencies
+target_compile_definitions(JuceSynth PRIVATE 
+    JUCE_WEB_BROWSER=0
+    JUCE_USE_CURL=0
 )
 
 # Add source files
@@ -40,15 +51,13 @@ target_include_directories(JuceSynth
 # Set C++ standard
 target_compile_features(JuceSynth PRIVATE cxx_std_17)
 
-# Add GTK include directories for GUI extra support on Linux
+# Add GTK include directories for GUI support on Linux
 if(UNIX AND NOT APPLE)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
-    pkg_check_modules(WEBKIT REQUIRED webkit2gtk-4.1)
-    pkg_check_modules(CURL REQUIRED libcurl)
-    target_include_directories(JuceSynth PRIVATE ${GTK3_INCLUDE_DIRS} ${WEBKIT_INCLUDE_DIRS})
-    target_link_libraries(JuceSynth PRIVATE ${GTK3_LIBRARIES} ${WEBKIT_LIBRARIES} ${CURL_LIBRARIES})
-    target_compile_options(JuceSynth PRIVATE ${GTK3_CFLAGS} ${WEBKIT_CFLAGS})
+    target_include_directories(JuceSynth PRIVATE ${GTK3_INCLUDE_DIRS})
+    target_link_libraries(JuceSynth PRIVATE ${GTK3_LIBRARIES})
+    target_compile_options(JuceSynth PRIVATE ${GTK3_CFLAGS})
 endif()
 
 # Add required JUCE modules
@@ -68,7 +77,6 @@ target_link_libraries(JuceSynth
         juce::juce_gui_basics
     PUBLIC
         juce::juce_recommended_config_flags
-        juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags
 )
 
